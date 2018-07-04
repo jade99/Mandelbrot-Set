@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -20,6 +21,9 @@ public class Main extends Application {
     private final double maxHeight = 2160.0;
 
     private final int maxIterations = 256;
+    private final double realOffset = 1.0;
+    private final double imaginaryOffset = 0.0;
+    private final double zoom = 2.0;
 
     private final Color[] colors = new Color[maxIterations];
 
@@ -36,11 +40,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Mandelbrot Set");
 
-        primaryStage.setMinWidth(minWidth);
-        primaryStage.setMinHeight(minHeight);
-
-        primaryStage.setMaxWidth(maxWidth);
-        primaryStage.setMaxHeight(maxHeight);
+        rootPane.setMinSize(minWidth, minHeight);
+        rootPane.setMinSize(maxWidth, maxHeight);
 
         Scene scene = new Scene(rootPane, width, height);
 
@@ -71,19 +72,35 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        primaryStage.sizeToScene();
+
+        double widthDiff = primaryStage.getWidth() - width;
+        double heightDiff = primaryStage.getHeight() - height;
+
+        primaryStage.setMinWidth(minWidth + widthDiff);
+        primaryStage.setMinHeight(minHeight + heightDiff);
+        primaryStage.setMaxWidth(maxWidth + widthDiff);
+        primaryStage.setMaxHeight(maxHeight + heightDiff);
     }
 
     private void redraw() {
         Canvas canvas = new Canvas(getWidth(), getHeight());
+        GraphicsContext canvasGraphics = canvas.getGraphicsContext2D();
+        PixelWriter pxWriter = canvasGraphics.getPixelWriter();
 
-        getRootPane().getChildren().add(canvas);
-
-        PixelWriter pxWriter = canvas.getGraphicsContext2D().getPixelWriter();
         Map<Point2D, Integer> values = calc();
 
         for (Map.Entry<Point2D, Integer> pixel : values.entrySet()) {
             pxWriter.setColor((int) pixel.getKey().getX(), (int) pixel.getKey().getY(), (pixel.getValue() <  maxIterations) ? colors[pixel.getValue()] : Color.BLACK);
         }
+
+        canvasGraphics.setStroke(Color.BLACK);
+        canvasGraphics.setLineWidth(1.0);
+        canvasGraphics.strokeLine(0.0, getHeight() / 2.0, getWidth(), getHeight() / 2.0);
+        canvasGraphics.strokeLine(getWidth() / 2.0, 0.0, getWidth() / 2.0, getHeight());
+
+        getRootPane().getChildren().add(canvas);
     }
 
     private Map<Point2D, Integer> calc() {
@@ -107,8 +124,8 @@ public class Main extends Application {
 
                 realZ = imaginaryZ = 0.0;
 
-                realC = map(x, startX, startX + minDim, -2.0, 2.0);
-                imaginaryC = map(y, startY, startY + minDim, 2.0, -2.0);
+                realC = map(x, startX, startX + minDim, -2.0, 2.0) / zoom + realOffset;
+                imaginaryC = map(y, startY, startY + minDim, 2.0, -2.0) / zoom + imaginaryOffset;
 
                 nullIterations();
                 while (getIterations() < getMaxIterations() && (realZ * realZ + imaginaryZ * imaginaryZ < 4.0)) {
