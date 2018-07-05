@@ -117,7 +117,7 @@ public class Main extends Application {
 
         //Calculating window border differences
         double widthDiff = primaryStage.getWidth() - getWidth();
-        double heightDiff = primaryStage.getHeight() - getWidth();
+        double heightDiff = primaryStage.getHeight() - getHeight();
 
 
         //setting correct min and max sizes for stage
