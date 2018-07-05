@@ -1,3 +1,5 @@
+package cc.jade99;
+
 //Imports
 import javafx.application.Application;
 import javafx.geometry.Point2D;
@@ -13,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-//Main class definition
+//cc.jade99.Main class definition
 public class Main extends Application {
 
     //Defining global FXComponents
@@ -40,7 +42,6 @@ public class Main extends Application {
     private final double realOffset = 0.0;
     private final double imaginaryOffset = 0.0;
     private final double zoom = 1.0;
-
 
 
     //Program entry-point
